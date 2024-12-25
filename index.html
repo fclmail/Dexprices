@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Current DEX Prices</title>
+    <style>
+        /* Style for the body */
+        body {
+            background-color: darkblue; /* Dark blue background */
+            color: white; /* White text color for better contrast */
+            font-family: Arial, sans-serif; /* Font style */
+            overflow: auto; /* Enable scrollbars */
+            position: absolute; /* Positioning */
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            border: 5px solid fluorescentblue; /* Fluorescent blue border */
+            box-sizing: border-box; /* Include border in width and height */
+        }
+
+        /* Style for the price table */
+        table {
+            width: 100%; /* Full width for the table */
+            border-collapse: collapse; /* Collapse borders */
+            margin-top: 20px; /* Margin on top of table */
+        }
+
+        th, td {
+            padding: 10px; /* Padding for table cells */
+            text-align: left; /* Align text to the left */
+            border-bottom: 1px solid white; /* Bottom border for rows */
+        }
+
+        /* Highlight the lowest price */
+        .lowest-price {
+            color: red; /* Red color for the lowest price */
+            font-weight: bold; /* Bold text */
+        }
+
+        /* Style for the date and time display */
+        #datetime {
+            margin: 20px; /* Margin for the date and time */
+            font-size: 18px; /* Font size */
+        }
+    </style>
+</head>
+<body>
+
+<h1>Current DEX Prices</h1>
+<div id="datetime"></div>
+<table id="priceTable">
+    <thead>
+        <tr>
+            <th>Exchange</th>
+            <th>Asset</th>
+            <th>Price (USD)</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Prices will be dynamically inserted here -->
+    </tbody>
+</table>
+
+<script>
+    // List of assets and exchanges
+    const assets = ["BTC", "WBTC", "ETH", "WETH", "SHIB", "DOGE", "XRP", "OKX"];
+    const exchanges = ["Uniswap", "SushiSwap", "PancakeSwap"];
+
+    // Function to fetch prices from Chainlink oracles or simulate them
+    async function fetchPrices() {
+        // Placeholder for price data
+        const prices = {
+            "Uniswap": {},
+            "SushiSwap": {},
+            "PancakeSwap": {}
+        };
+
+        // Simulate fetching prices for all assets from all exchanges
+        // In a real implementation, replace this with actual Chainlink price fetch logic
+        prices["Uniswap"]["BTC"] = Math.random() * 50000;
+        prices["Uniswap"]["WBTC"] = Math.random() * 50000;
+        prices["Uniswap"]["ETH"] = Math.random() * 3000;
+        prices["Uniswap"]["WETH"] = Math.random() * 3000;
+        prices["Uniswap"]["SHIB"] = Math.random() * 0.00001;
+        prices["Uniswap"]["DOGE"] = Math.random() * 0.1;
+        prices["Uniswap"]["XRP"] = Math.random() * 1;
+        prices["Uniswap"]["OKX"] = Math.random() * 10;
+
+        prices["SushiSwap"]["BTC"] = Math.random() * 50000;
+        prices["SushiSwap"]["WBTC"] = Math.random() * 50000;
+        prices["SushiSwap"]["ETH"] = Math.random() * 3000;
+        prices["SushiSwap"]["WETH"] = Math.random() * 3000;
+        prices["SushiSwap"]["SHIB"] = Math.random() * 0.00001;
+        prices["SushiSwap"]["DOGE"] = Math.random() * 0.1;
+        prices["SushiSwap"]["XRP"] = Math.random() * 1;
+        prices["SushiSwap"]["OKX"] = Math.random() * 10;
+
+        prices["PancakeSwap"]["BTC"] = Math.random() * 50000;
+        prices["PancakeSwap"]["WBTC"] = Math.random() * 50000;
+        prices["PancakeSwap"]["ETH"] = Math.random() * 3000;
+        prices["PancakeSwap"]["WETH"] = Math.random() * 3000;
+        prices["PancakeSwap"]["SHIB"] = Math.random() * 0.00001;
+        prices["PancakeSwap"]["DOGE"] = Math.random() * 0.1;
+        prices["PancakeSwap"]["XRP"] = Math.random() * 1;
+        prices["PancakeSwap"]["OKX"] = Math.random() * 10;
+
+        // Update the price table
+        updatePriceTable(prices);
+    }
+
+    // Function to update the price table
+    function updatePriceTable(prices) {
+        const tableBody = document.querySelector("#priceTable tbody");
+        tableBody.innerHTML = ""; // Clear previous data
+
+        // Prepare an object to hold the lowest prices for each asset
+        let lowestPrices = {};
+
+        // First pass to populate the lowest prices
+        for (const exchange in prices) {
+            for (const asset in prices[exchange]) {
+                const price = prices[exchange][asset];
+
+                // Initialize lowest price object if not exists
+                if (!lowestPrices[asset]) {
+                    lowestPrices[asset] = { price: Infinity, exchange: "" };
+                }
+
+                // Update the lowest price if the current price is lower
+                if (price < lowestPrices[asset].price) {
+                    lowestPrices[asset].price = price;
+                    lowestPrices[asset].exchange = exchange;
+                }
+            }
+        }
+
+        // Second pass to build the table with highlighted lowest prices
+        for (const exchange in prices) {
+            for (const asset in prices[exchange]) {
+                const price = prices[exchange][asset];
+                const row = document.createElement("tr");
+
+                // Create cells for exchange, asset, and price
+                const exchangeCell = document.createElement("td");
+                exchangeCell.textContent = exchange;
+                row.appendChild(exchangeCell);
+
+                const assetCell = document.createElement("td");
+                assetCell.textContent = asset;
+                row.appendChild(assetCell);
+
+                const priceCell = document.createElement("td");
+                priceCell.textContent = price.toFixed(2); // Display price formatted to two decimal places
+
+                // Highlight the lowest price
+                if (price === lowestPrices[asset].price && lowestPrices[asset].exchange === exchange) {
+                    priceCell.classList.add("lowest-price");
+                }
+
+                row.appendChild(priceCell);
+                tableBody.appendChild(row);
+            }
+        }
+    }
+
+    // Function to update the current date and time
+    function updateDateTime() {
+        const now = new Date();
+        const datetimeElement = document.getElementById("datetime");
+        datetimeElement.textContent = now.toLocaleString(); // Format date and time
+    }
+
+    // Function to update prices and date/time every 2 seconds
+    function updateData() {
+        fetchPrices(); // Fetch prices
+        updateDateTime(); // Update date and time
+    }
+
+    // Set interval to update data every 2 seconds
+    setInterval(updateData, 2000);
+    updateData(); // Initial call to populate data immediately
+</script>
+
+</body>
+</html>
